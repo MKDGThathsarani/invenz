@@ -1,0 +1,67 @@
+.dashboard { max-width: 1400px; margin: 0 auto; }
+
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.page-header p { color: #666; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.chart-placeholder {
+  height: 250px;
+  background: #f8faf8;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.low-stock-list { display: flex; flex-direction: column; gap: 12px; }
+
+.stock-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f8faf8;
+}
+
+.stock-item.danger { border-left: 4px solid #F44336; background: #fff5f5; }
+.stock-item.warning { border-left: 4px solid #FF9800; background: #fff8f0; }
+.stock-item.success { border-left: 4px solid #43A047; background: #f0faf0; }
+
+.stock-name { font-weight: 500; }
+.stock-quantity { font-weight: 600; }
+
+.stock-action {
+  padding: 4px 12px;
+  background: #1B5E20;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.stock-status { font-size: 0.85rem; }
+
+@media (max-width: 768px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
