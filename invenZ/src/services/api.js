@@ -1,4 +1,4 @@
-// src/services/api.js
+// src/services/api.js - DEMO MODE
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -8,7 +8,6 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
 });
 
 // Request interceptor - Add token to every request
@@ -23,25 +22,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - Handle errors
+// Response interceptor - Handle errors (DEMO MODE)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle 401 Unauthorized
+    // ✅ DEMO MODE: Don't redirect on errors
+    console.warn('API Error:', error.message);
+    
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      // ✅ Don't redirect in demo mode
+      // localStorage.removeItem('token');
+      // window.location.href = '/login';
     }
-    
-    // Handle network errors
-    if (!error.response) {
-      console.error('Network Error:', error.message);
-      return Promise.reject({ 
-        message: 'Network error. Please check your connection.' 
-      });
-    }
-    
     return Promise.reject(error);
   }
 );

@@ -1,10 +1,12 @@
-// src/context/ProductContext.jsx - CONNECTED TO BACKEND
+// src/context/ProductContext.jsx
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import { productService } from '../services';
 import { useNotification } from './NotificationContext';
 
+// Create Product Context
 const ProductContext = createContext(null);
 
+// Product Provider
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -15,6 +17,7 @@ export const ProductProvider = ({ children }) => {
 
   const { success, error: showError } = useNotification();
 
+  // Load all products
   const loadProducts = useCallback(async (params = {}) => {
     try {
       setLoading(true);
@@ -22,7 +25,7 @@ export const ProductProvider = ({ children }) => {
       const response = await productService.getAll(params);
       setProducts(response.data || []);
       setTotalCount(response.total || response.data?.length || 0);
-      setLoading(false);
+      setLoading(false); // ✅ FIXED: Success වුනාම loading false වෙන්න ඕන!
       return response;
     } catch (err) {
       setError(err.message || 'Failed to load products');
@@ -32,6 +35,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, [showError]);
 
+  // Load categories
   const loadCategories = useCallback(async () => {
     try {
       const response = await productService.getCategories();
@@ -43,6 +47,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+  // Get product by ID
   const getProduct = useCallback(async (id) => {
     try {
       setLoading(true);
@@ -57,6 +62,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+  // Create product
   const createProduct = useCallback(async (data) => {
     try {
       setLoading(true);
@@ -75,6 +81,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, [success, showError]);
 
+  // Update product
   const updateProduct = useCallback(async (id, data) => {
     try {
       setLoading(true);
@@ -94,6 +101,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, [success, showError]);
 
+  // Delete product
   const deleteProduct = useCallback(async (id) => {
     try {
       setLoading(true);
@@ -112,6 +120,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, [success, showError]);
 
+  // Load low stock products
   const loadLowStock = useCallback(async () => {
     try {
       const response = await productService.getLowStock();
@@ -123,6 +132,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+  // Search products
   const searchProducts = useCallback(async (query) => {
     try {
       setLoading(true);
@@ -136,6 +146,7 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
+  // Initialize data
   useEffect(() => {
     loadProducts();
     loadCategories();
@@ -166,6 +177,7 @@ export const ProductProvider = ({ children }) => {
   );
 };
 
+// Custom hook to use product context
 export const useProduct = () => {
   const context = useContext(ProductContext);
   if (!context) {
