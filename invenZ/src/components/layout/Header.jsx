@@ -1,4 +1,4 @@
-// src/components/layout/Header.jsx - WITH LOGIN/LOGOUT
+// src/components/layout/Header.jsx - WITH NOTIFICATION DROPDOWN
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -9,6 +9,17 @@ const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // ✅ Demo Notifications
+  const notifications = [
+    { id: 1, icon: '📦', message: 'New product added: Premium Rice', time: '5 min ago', read: false },
+    { id: 2, icon: '⚠️', message: 'Low stock alert: Sugar (8 left)', time: '1 hour ago', read: false },
+    { id: 3, icon: '📊', message: 'Monthly report is ready', time: '2 hours ago', read: false },
+    { id: 4, icon: '✅', message: 'Order #PO-2026-001 delivered', time: '1 day ago', read: true },
+  ];
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -20,6 +31,14 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const markAsRead = (id) => {
+    console.log('Mark as read:', id);
+  };
+
+  const markAllAsRead = () => {
+    console.log('Mark all as read');
   };
 
   return (
@@ -47,32 +66,94 @@ const Header = () => {
 
         {/* Actions */}
         <div className="header-actions-modern">
-          <button 
-            className="notification-btn-modern"
-            onClick={() => setShowNotifications(!showNotifications)}
-          >
-            <span className="notification-icon">🔔</span>
-            <span className="notification-badge">3</span>
-          </button>
+          {/* ✅ Notification Button with Dropdown */}
+          <div className="notification-wrapper">
+            <button 
+              className="notification-btn-modern"
+              onClick={() => setShowNotifications(!showNotifications)}
+              aria-label="Notifications"
+            >
+              <span className="notification-icon">🔔</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
+            </button>
 
-          {isAuthenticated ? (
-            // Logged In - Show User Profile
-            <div className="user-profile-modern">
-              <img
-                src={`https://ui-avatars.com/api/?name=${user?.name || 'Admin'}&background=1B5E20&color=fff&bold=true&size=40`}
-                alt="User"
-                className="user-avatar-modern"
-              />
-              <div className="user-info-modern">
-                <span className="user-name-modern">{user?.name || 'Admin'}</span>
-                <span className="user-role-modern">{user?.role || 'Administrator'}</span>
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="notification-dropdown">
+                <div className="dropdown-header">
+                  <h4>Notifications</h4>
+                  {unreadCount > 0 && (
+                    <button className="mark-all-btn" onClick={markAllAsRead}>
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+                <div className="dropdown-body">
+                  {notifications.length === 0 ? (
+                    <div className="empty-notifications">
+                      <span>🔕</span>
+                      <p>No notifications</p>
+                    </div>
+                  ) : (
+                    notifications.map((notif) => (
+                      <div 
+                        key={notif.id} 
+                        className={`notification-item ${notif.read ? 'read' : 'unread'}`}
+                        onClick={() => markAsRead(notif.id)}
+                      >
+                        <span className="notif-icon">{notif.icon}</span>
+                        <div className="notif-content">
+                          <p className="notif-message">{notif.message}</p>
+                          <span className="notif-time">{notif.time}</span>
+                        </div>
+                        {!notif.read && <span className="notif-dot"></span>}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="dropdown-footer">
+                  <button className="view-all-btn">View All Notifications</button>
+                </div>
               </div>
-              <button className="logout-btn-modern" onClick={handleLogout}>
-                Logout
-              </button>
+            )}
+          </div>
+
+          {/* User Profile / Login */}
+          {isAuthenticated ? (
+            <div className="user-profile-wrapper">
+              <div 
+                className="user-profile-modern"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <img
+                  src={`https://ui-avatars.com/api/?name=${user?.name || 'Admin'}&background=1B5E20&color=fff&bold=true&size=40`}
+                  alt="User"
+                  className="user-avatar-modern"
+                />
+                <div className="user-info-modern">
+                  <span className="user-name-modern">{user?.name || 'Admin'}</span>
+                  <span className="user-role-modern">{user?.role || 'Administrator'}</span>
+                </div>
+                <span className="dropdown-arrow">▼</span>
+              </div>
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <button onClick={() => navigate('/settings/profile')}>
+                    <span>👤</span> Profile
+                  </button>
+                  <button onClick={() => navigate('/settings')}>
+                    <span>⚙️</span> Settings
+                  </button>
+                  <hr />
+                  <button onClick={handleLogout} className="logout-btn">
+                    <span>🚪</span> Logout
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
-            // Not Logged In - Show Login Button
             <button 
               className="login-btn-modern" 
               onClick={() => navigate('/login')}
